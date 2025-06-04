@@ -30,3 +30,5 @@ I am a hobby operating system (version 0.98 alpha)
 - [x] GRUB
 - [ ] Custom Bootloader
 - [ ] UEFI Bootloader
+
+![screenshot from qemu running NurOs](assets/nuros.png)
