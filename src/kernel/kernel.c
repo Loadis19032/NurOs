@@ -37,10 +37,12 @@ void main(uint32_t magic, struct multiboot_info* boot) {
 
     uint16_t identify_data[256];
     if (ata_identify(identify_data) == 0) {
-        print("Disk finded!");
+        print("Disk finded!\n");
         uint16_t sector_buffer[256];
         ata_read_sectors(0, 1, sector_buffer);
     }
+
+    print("NurOs-> ");
 
     //set_screen_color(0x6F);
     for(;;);
