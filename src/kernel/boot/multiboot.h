@@ -17,6 +17,8 @@ struct multiboot_elf_section_header_table
   uint32_t shndx;
 };
 
+#define MULTIBOOT_INFO_VBE_INFO         (1 << 11)
+
 struct multiboot_info{
     uint32_t flags;
     uint32_t mem_lower;
@@ -43,7 +45,7 @@ struct multiboot_info{
 
     uint32_t apm_table;
 
-    uint32_t vbe_control_info;
+    int32_t vbe_control_info;
     uint32_t vbe_mode_info;
     uint16_t vbe_mode;
     uint16_t vbe_interface_seg;

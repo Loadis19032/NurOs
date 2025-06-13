@@ -6,6 +6,8 @@ void outPortB(uint16_t Port, uint8_t Value);
 char inPortB(uint16_t port);
 void outPortW(uint16_t port, uint16_t val);
 uint16_t inPortW(uint16_t port);
+void outPortD(uint16_t port, uint32_t value);
+uint32_t inPortD(uint16_t port);
 
 #define CEIL_DIV(a,b) (((a + b) - 1)/b)
 

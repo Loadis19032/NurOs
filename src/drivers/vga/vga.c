@@ -10,7 +10,7 @@ uint16_t currentColor = defaultColor;
 void SetScreenColor(uint8_t color) {
     uint8_t* video_memory = (uint8_t*)0xC00B8000;
 
-    for (int i = 0; i < width * height * 2; i += 2) {
+    for (int i = 0; i < VGA_WIDTH * VGA_HEIGHT * 2; i += 2) {
         video_memory[i + 1] = color;
     }
 }
@@ -32,20 +32,20 @@ const char* split(const char *str) {
     return str + 1;
 }
 
-void Reset(){
+void ClearScreen(){
     line = 0;
     column = 0;
     currentColor = defaultColor;
 
-    for (uint16_t y = 0; y < height; y++){
-        for (uint16_t x = 0; x < width; x++){
-            vga[y * width + x] = ' ' | defaultColor;
+    for (uint16_t y = 0; y < VGA_HEIGHT; y++){
+        for (uint16_t x = 0; x < VGA_WIDTH; x++){
+            vga[y * VGA_WIDTH + x] = ' ' | defaultColor;
         }
     }
 }
 
 void newLine(){
-    if (line < height - 1){
+    if (line < VGA_HEIGHT - 1){
         line++;
         column = 0;
     }
@@ -55,15 +55,28 @@ void newLine(){
     }
 }
 
-void scrollUp(){
-    for (uint16_t y = 0; y < height; y++){
-        for (uint16_t x = 0; x < width; x++){
-            vga[(y-1) * width + x] = vga[y*width+x];
+void scrollUp() {
+    // Сдвигаем строки вверх, начиная с y=1
+    for (uint16_t y = 1; y < VGA_HEIGHT; y++) {
+        for (uint16_t x = 0; x < VGA_WIDTH; x++) {
+            vga[(y - 1) * VGA_WIDTH + x] = vga[y * VGA_WIDTH + x];
         }
     }
+    
+    // Очищаем нижнюю строку (y=VGA_HEIGHT-1) пробелами с текущим цветом
+    for (uint16_t x = 0; x < VGA_WIDTH; x++) {
+        vga[(VGA_HEIGHT - 1) * VGA_WIDTH + x] = ' ' | currentColor;
+    }
+}
 
-    for (uint16_t x = 0; x < width; x++){
-        vga[(height-1) * width + x] = ' ' | currentColor;
+void scrollDown() {
+    for (uint16_t y = VGA_HEIGHT - 1; y > 0; y--) {
+        for (uint16_t x = 0; x < VGA_WIDTH; x++) {
+            vga[y * VGA_WIDTH + x] = vga[(y - 1) * VGA_WIDTH + x];
+        }
+    }
+    for (uint16_t x = 0; x < VGA_WIDTH; x++) {
+        vga[x] = ' ' | currentColor;
     }
 }
 
@@ -78,31 +91,31 @@ void print(const char* s){
                 break;
             case '\b':
                 if(column == 8) {
-                    vga[line * width + (++column)] = ' ' | currentColor;
+                    vga[line * VGA_WIDTH + (++column)] = ' ' | currentColor;
                     break;
                 }
                 if (column == 0 && line != 0){
                     line--;
-                    column = width;
+                    column = VGA_WIDTH;
                 }
-                vga[line * width + (--column)] = ' ' | currentColor;
+                vga[line * VGA_WIDTH + (--column)] = ' ' | currentColor;
                 break;
             case '\t':
-                if (column == width){
+                if (column == VGA_WIDTH){
                     newLine();
                 }
                 uint16_t tabLen = 4 - (column % 4);
                 while (tabLen != 0){
-                    vga[line * width + (column++)] = ' ' | currentColor;
+                    vga[line * VGA_WIDTH + (column++)] = ' ' | currentColor;
                     tabLen--;
                 }
                 break;
             default:
-                if (column == width){
+                if (column == VGA_WIDTH){
                     newLine();
                 }
 
-                vga[line * width + (column++)] = *s | currentColor;
+                vga[line * VGA_WIDTH + (column++)] = *s | currentColor;
                 break;
         }
         s++;

@@ -43,3 +43,21 @@ uint16_t inPortW(uint16_t port) {
 void outPortW(uint16_t port, uint16_t val) {
     asm volatile ("outw %0, %1" : : "a"(val), "Nd"(port));
 }
+
+void outPortD(uint16_t port, uint32_t value) {
+    asm volatile (
+        "outl %0, %1" 
+        : 
+        : "a"(value), "Nd"(port)
+    );
+}
+
+uint32_t inPortD(uint16_t port) {
+    uint32_t result;
+    asm volatile (
+        "inl %1, %0" 
+        : "=a"(result)
+        : "Nd"(port)
+    );
+    return result;
+}

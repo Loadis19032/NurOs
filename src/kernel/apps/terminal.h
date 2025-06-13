@@ -1,0 +1,1 @@
+void terminal_execute(const char* command);

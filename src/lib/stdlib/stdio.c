@@ -1,7 +1,9 @@
 #include "stdio.h"
 #include "../../drivers/vga/vga.h"
+#include "string.h"
 
-void putc(char c){
+void putc(char c)
+{
     print(&c);
 }
 
@@ -12,107 +14,116 @@ void puts(const char* s){
     }
 }
 
-void printf(const char* fmt, ...){
-    int* argp = (int*) &fmt;
+void printf(const char* fmt, ...) {
+    int* argp = (int*)&fmt + 1; // Указатель на аргументы (сдвиг на адрес после fmt)
+
     int state = PRINTF_STATE_START;
     int length = PRINTF_LENGTH_START;
     int radix = 10;
-    bool sign = false;
+    int sign = 0;
 
-    argp++;
-    while (*fmt){
-        switch(state){
+    while (*fmt) {
+        switch (state) {
         case PRINTF_STATE_START:
-            if (*fmt == '%'){
+            if (*fmt == '%') {
                 state = PRINTF_STATE_LENGTH;
-            }else{
-                putc(*fmt);
+            } else {
+                putc(*fmt); // Выводим символ напрямую
             }
             break;
         case PRINTF_STATE_LENGTH:
-            if (*fmt == 'h'){
+            if (*fmt == 'h') {
                 length = PRINTF_LENGTH_SHORT;
                 state = PRINTF_STATE_SHORT;
-            }else if (*fmt == 'l'){
+            } else if (*fmt == 'l') {
                 length = PRINTF_LENGTH_LONG;
                 state = PRINTF_STATE_LONG;
-            }else{
+            } else {
                 goto PRINTF_STATE_SPEC_;
             }
             break;
-            //hd
         case PRINTF_STATE_SHORT:
-            if (*fmt == 'h'){
+            if (*fmt == 'h') {
                 length = PRINTF_LENGTH_SHORT_SHORT;
                 state = PRINTF_STATE_SPEC;
-            }else{
+            } else {
                 goto PRINTF_STATE_SPEC_;
             }
             break;
-
         case PRINTF_STATE_LONG:
-            if (*fmt == 'l'){
-                    length = PRINTF_LENGTH_LONG_LONG;
-                    state = PRINTF_STATE_SPEC;
-                }else{
-                    goto PRINTF_STATE_SPEC_;
-                }
+            if (*fmt == 'l') {
+                length = PRINTF_LENGTH_LONG_LONG;
+                state = PRINTF_STATE_SPEC;
+            } else {
+                goto PRINTF_STATE_SPEC_;
+            }
             break;
-
         case PRINTF_STATE_SPEC:
-            PRINTF_STATE_SPEC_:
-                switch(*fmt){
-                    case 'c':
-                        putc((char)*argp);
-                        argp++;
-                        break;
-                    case 's':
-                        if (length == PRINTF_LENGTH_LONG || length == PRINTF_LENGTH_LONG_LONG){
-                            puts(*(const char **)argp);
-                            argp += 2;
-                        }else{
-                            puts(*(const char **)argp);
-                            argp++;
-                        }
-                        break;
-                    case '%':
-                        putc('%');
-                        break;
-                    case 'd':
-                    case 'i':
-                        radix = 10;
-                        sign = true;
-                        argp = printf_number(argp, length, sign, radix);
-                        break;
-                    case 'u':
-                        radix = 10;
-                        sign = false;
-                        argp = printf_number(argp, length, sign, radix);
-                        break;
-                    case 'X':
-                    case 'x':
-                    case 'p':
-                        radix = 16;
-                        sign = false;
-                        argp = printf_number(argp, length, sign, radix);
-                        break;
-                    case 'o':
-                        radix = 8;
-                        sign = false;
-                        argp = printf_number(argp, length, sign, radix);
-                        break;
-                    default:
-                        break;
-
+        PRINTF_STATE_SPEC_:
+            switch (*fmt) {
+            case 'c':
+                putc((char)*argp);
+                argp++;
+                break;
+            case 's': {
+                const char* str = *(const char**)argp; // Читаем указатель на строку
+                if (str) {
+                    puts(str); // Выводим строку через puts
                 }
+                argp++; // Сдвигаем указатель на следующий аргумент
+                break;
+            }
+            case '%':
+                putc('%');
+                break;
+            case 'd':
+            case 'i':
+                radix = 10;
+                sign = 1;
+                argp = (int*)printf_number(argp, length, sign, radix);
+                break;
+            case 'u':
+                radix = 10;
+                sign = 0;
+                argp = (int*)printf_number(argp, length, sign, radix);
+                break;
+            case 'X':
+            case 'x':
+                radix = 16;
+                sign = 0;
+                argp = (int*)printf_number(argp, length, sign, radix);
+                break;
+            case 'p':
+                radix = 16;
+                sign = 0;
+                argp = (int*)printf_number(argp, length, sign, radix);
+                break;
+            case 'o':
+                radix = 8;
+                sign = 0;
+                argp = (int*)printf_number(argp, length, sign, radix);
+                break;
+            case 'l':
+                if (*fmt+1 == 'l') {
+                    if (*fmt+2 == 'u')
+                    {
+                        radix = 10;
+                        sign = 0;
+                        argp = (int*)printf_number(argp, length, sign, radix);
+                    }
+                }
+                break;
+            default:
+                break;
+            }
             state = PRINTF_STATE_START;
             length = PRINTF_LENGTH_START;
             radix = 10;
-            sign = false;
+            sign = 0;
             break;
-            }
+        }
         fmt++;
-    }    
+    }
 }
 
 const char possibleChars[] = "0123456789abcdef";

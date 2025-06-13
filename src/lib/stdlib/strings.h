@@ -1,6 +1,5 @@
 #include "../../drivers/vga/vga.h"
 #include "stdint.h"
-#include "../../drivers/keyboard/keyboard.h"
 
 
 int comp(const char *first, const char *second) {

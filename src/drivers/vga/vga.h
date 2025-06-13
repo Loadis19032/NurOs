@@ -19,12 +19,14 @@
 #define COLOR8_LIGHT_BROWN 14
 #define COLOR8_WHITE 15
 
-#define width 80
-#define height 25
+#define VGA_WIDTH 80
+#define VGA_HEIGHT 25
 
 void print(const char* s);
+void putc(char c);
 const char* split(const char *str);
 void scrollUp();
+void scrollDown();
 void newLine();
-void Reset();
+void ClearScreen();
 void SetScreenColor(uint8_t color);

@@ -5,11 +5,12 @@
 #include "keyboard.h"
 #include "../vga/vga.h"
 #include "../../kernel/fs/vfs/vfs.h"
-#include "../../lib/stdlib/strings.h"
+#include "../../kernel/apps/terminal.h"
 
 
 bool capsOn;
 bool capsLock;
+bool enter = false;
 
 char text[100] = { 0 };
 
@@ -196,26 +197,7 @@ void keyboardHandler(struct InterruptRegisters *regs){
           break;
         case 28:
           if(press == 0) {
-              if(comp("clear", text) != 0) {
-                  Reset();
-              }
-              else if(comp("exit", text) != 0) {
-                  print("\t exit");
-              }
-              else if(comp("info", text) != 0) {
-                  print("\tbasic commands exit, clear, info");
-              }
-              else if(comp("ls", text) != 0) {
-                  print("\n");
-                  printfs();
-              }
-              else{
-                  const char* out = split(text);
-                  print(out);
-                  print("\ncommand not found");
-              }
-              print("\nNurOs-> ");
-              clear();
+              terminal_execute(text);
           }
           break;
         //case 15:
@@ -235,6 +217,12 @@ void keyboardHandler(struct InterruptRegisters *regs){
         case 66:
         case 67:
         case 68:
+        case 72:
+          scrollUp();
+          break;
+        case 80:
+          scrollDown();
+          break;
         case 87:
         case 88:
             break;
@@ -260,12 +248,12 @@ void keyboardHandler(struct InterruptRegisters *regs){
                       print("\b");
                       break;
                   }
-                  if (capsOn || capsLock){
-                    printf("%c", uppercase[scanCode]);
-                  }
-                  else{
-                    printf("%c", lowercase[scanCode]);
-                  } 
+                  //if (capsOn || capsLock){
+                  //  printf("%c", uppercase[scanCode]);
+                  //}
+                  //else{
+                  //  printf("%c", lowercase[scanCode]);
+                  //} 
             }
 
             

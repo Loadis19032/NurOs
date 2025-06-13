@@ -50,8 +50,8 @@ higher_half:
     PUSH ebx
     PUSH eax
     XOR ebp, ebp
-    extern main
-    CALL main
+    extern kmain
+    CALL kmain
 
 halt:
     hlt
