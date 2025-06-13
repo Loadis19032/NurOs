@@ -5,11 +5,11 @@ I am a hobby operating system (version 0.98 alpha)
 #### General
 - [x] paging
 - [x] stdlib
+- [x] base SMBIOS
 
 #### Drivers
 - [x] disk driver
     - [x] ATA (PIO) disk
-    - [ ] ATA (IDE) disk
     - [ ] ACHI disk
     - [ ] NVME disk
 - [x] graphics
@@ -28,7 +28,7 @@ I am a hobby operating system (version 0.98 alpha)
 
 #### Bootloader
 - [x] GRUB
-- [ ] Custom Bootloader
+- [x] Custom Bootloader
 - [ ] UEFI Bootloader
 
 ![screenshot from qemu running NurOs](assets/nuros.png)
